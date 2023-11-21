@@ -1,4 +1,6 @@
+import styled from 'styled-components';
 export const ImageGalleryItem = ({ items }) => {
+  console.log('items:', items);
   return (
     <ul>
       {items.map(item => (
