@@ -1,8 +1,4 @@
-import {
-  Form as FormikForm,
-  Field as FormikField,
-  //   ErrorMessage as FormikError,
-} from 'formik';
+import { Form as FormikForm, Field as FormikField } from 'formik';
 import styled from 'styled-components';
 
 export const Searchbar = styled.div`
