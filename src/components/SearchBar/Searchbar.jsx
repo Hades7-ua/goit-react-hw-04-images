@@ -1,5 +1,5 @@
 import { Formik } from 'formik';
-import { FiSearch } from 'react-icons/fi';
+import { ImSearch } from 'react-icons/im';
 import { Field, Form, SearchFormButton, Searchbar } from './Searchbar.styled';
 
 export const SearchBar = ({ onSubmit }) => {
@@ -20,7 +20,7 @@ export const SearchBar = ({ onSubmit }) => {
             placeholder="Search images and photos"
           />
           <SearchFormButton type="submit" component="span">
-            <FiSearch />
+            <ImSearch />
           </SearchFormButton>
         </Form>
       </Formik>
