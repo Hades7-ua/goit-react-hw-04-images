@@ -1,13 +1,12 @@
 import styled from 'styled-components';
-export const ImageGalleryItem = ({ items }) => {
-  console.log('items:', items);
+
+import { GalleryItem, GalleryImage } from './ImageGalleryItem.styled';
+export const ImageGalleryItem = ({ image }) => {
   return (
-    <ul>
-      {items.map(item => (
-        <li key={item.id}>
-          <img src={item.webformatURL} alt={item.tags} />
-        </li>
-      ))}
-    </ul>
+    <GalleryItem>
+      <GalleryImage src={image.webformatURL} alt={image.tags} />
+    </GalleryItem>
   );
 };
+
+export default ImageGalleryItem;

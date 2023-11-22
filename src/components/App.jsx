@@ -1,9 +1,9 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { MagnifyingGlass } from 'react-loader-spinner';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { fetchImages } from 'services/api';
-import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
-import { SearchBar } from './SearchBar/Searchbar';
+import ImageGallery from './ImageGallery/ImageGallery';
+import { SearchBar } from './SearchBar/SearchBar';
 
 export class App extends Component {
   state = {
@@ -12,38 +12,53 @@ export class App extends Component {
     query: '',
     page: 1,
   };
+
   async componentDidMount() {
-    try {
-      this.setState({ isLoading: true });
-      const initialImages = await fetchImages();
-      // console.log(initialImages);
-      this.setState({ images: initialImages.hits });
-    } catch (error) {
-    } finally {
-      this.setState({ isLoading: false });
+    await this.fetchInitialImages();
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    const { query, page } = this.state;
+
+    if (query !== prevState.query || page !== prevState.page) {
+      await this.fetchImages();
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.query !== this.state.query ||
-      prevState.page !== this.state.page
-    ) {
-      this.handleSearchImageName();
+  fetchInitialImages = async () => {
+    this.setState({ isLoading: true });
+    try {
+      const initialImages = await fetchImages();
+      this.setState({ images: initialImages.hits });
+    } catch (error) {
+      console.error('Error fetching initial images:', error);
+    } finally {
+      this.setState({ isLoading: false });
     }
-  }
+  };
+
+  fetchImages = async () => {
+    const { query, page } = this.state;
+    this.setState({ isLoading: true });
+    try {
+      const newImages = await fetchImages(query, page);
+      this.setState(prevState => ({
+        images: newImages.hits,
+      }));
+    } catch (error) {
+      toast.error('Error fetching images:', error);
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
 
   handleSearchImageName = async newName => {
     try {
-      this.setState({ isLoading: true });
-      console.log('Searching for:', newName);
-      const addName = await fetchImages(newName);
-      this.setState({ images: addName.hits, query: newName, page: 1 });
-      console.log('Images found:', addName.hits);
+      this.setState({ query: newName, page: 1 }, () => {
+        this.fetchImages();
+      });
     } catch (error) {
       toast.error('ERROR!!! Write name for search!');
-    } finally {
-      this.setState({ isLoading: false });
     }
   };
 
@@ -68,7 +83,8 @@ export class App extends Component {
         ) : (
           <>
             <SearchBar onSubmit={this.handleSearchImageName} />
-            <ImageGalleryItem items={images} />
+            <ImageGallery images={images} />
+
             <button>Load More</button>
           </>
         )}
