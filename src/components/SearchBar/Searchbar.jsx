@@ -1,7 +1,6 @@
 import { Formik } from 'formik';
 import { ImSearch } from 'react-icons/im';
 import { Field, Form, SearchFormButton, Searchbar } from './Searchbar.styled';
-
 export const SearchBar = ({ onSubmit }) => {
   return (
     <Searchbar>
