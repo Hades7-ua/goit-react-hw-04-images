@@ -3,7 +3,7 @@ import { MagnifyingGlass } from 'react-loader-spinner';
 import toast from 'react-hot-toast';
 import { fetchImages } from 'services/api';
 import ImageGallery from './ImageGallery/ImageGallery';
-import { SearchBar } from './SearchBar/SearchBar';
+import { SearchBar } from './SearchBar/Searchbar';
 
 export class App extends Component {
   state = {
