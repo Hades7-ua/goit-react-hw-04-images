@@ -4,11 +4,12 @@ import toast from 'react-hot-toast';
 import { fetchImages } from 'services/api';
 import ImageGallery from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/Searchbar';
-
+import { BtnLoadMore } from './ButtonLoadMore/LoadMoreBtn';
 export class App extends Component {
   state = {
     images: [],
     isLoading: false,
+    error: false,
     query: '',
     page: 1,
   };
@@ -26,7 +27,7 @@ export class App extends Component {
   }
 
   fetchInitialImages = async () => {
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, page: 1, images: [] });
     try {
       const initialImages = await fetchImages();
       this.setState({ images: initialImages.hits });
@@ -43,7 +44,10 @@ export class App extends Component {
     try {
       const newImages = await fetchImages(query, page);
       this.setState(prevState => ({
-        images: newImages.hits,
+        images:
+          page === 1
+            ? newImages.hits
+            : [...prevState.images, ...newImages.hits],
       }));
     } catch (error) {
       toast.error('Error fetching images:', error);
@@ -60,6 +64,14 @@ export class App extends Component {
     } catch (error) {
       toast.error('ERROR!!! Write name for search!');
     }
+  };
+
+  handleLoadMore = async () => {
+    await this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+
+    await this.fetchImages();
   };
 
   render() {
@@ -84,11 +96,12 @@ export class App extends Component {
           <>
             <SearchBar onSubmit={this.handleSearchImageName} />
             <ImageGallery images={images} />
-
-            <button>Load More</button>
+            <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
           </>
         )}
       </div>
     );
   }
 }
+
+export default App;
