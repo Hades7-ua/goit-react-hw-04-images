@@ -6,7 +6,7 @@ import ImageGallery from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/Searchbar';
 import { BtnLoadMore } from './ButtonLoadMore/LoadMoreBtn';
 import Spinner from './Loader/Spinner';
-// import Modal from './Modal/Modal';
+import Modal from './Modal/Modal';
 export class App extends Component {
   state = {
     images: [],
@@ -15,6 +15,8 @@ export class App extends Component {
     query: '',
     page: 1,
     showModal: false,
+    largeImageURL: '',
+    tagImage: '',
   };
 
   componentDidMount() {
@@ -57,17 +59,40 @@ export class App extends Component {
     }));
   };
 
+  openModal = image => {
+    const { largeImageURL, tags } = image;
+    this.setState({
+      showModal: true,
+      largeImageURL,
+      tagImage: tags,
+    });
+  };
+
+  closeModal = () => {
+    this.setState({
+      showModal: false,
+      largeImageURL: '',
+      tagImage: '',
+    });
+  };
+
   render() {
-    const { images, isLoading } = this.state;
+    const { images, isLoading, showModal, largeImageURL, tagImage } =
+      this.state;
 
     return (
       <AppStyled>
         {isLoading && <Spinner />}
         <>
           <SearchBar onSubmit={this.handleSearchImageName} />
-          <ImageGallery images={images} onImageClick={this.openModal} />
+          <ImageGallery images={images} onClickModal={this.openModal} />
         </>
         <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
+        {showModal && (
+          <Modal onCloseModal={this.closeModal}>
+            <img src={largeImageURL} alt={tagImage} />
+          </Modal>
+        )}
       </AppStyled>
     );
   }
