@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { MagnifyingGlass } from 'react-loader-spinner';
+
 import toast from 'react-hot-toast';
 import { fetchImages } from 'services/api';
 import ImageGallery from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/Searchbar';
 import { BtnLoadMore } from './ButtonLoadMore/LoadMoreBtn';
+import Spinner from './Loader/Spinner';
 export class App extends Component {
   state = {
     images: [],
@@ -12,10 +13,11 @@ export class App extends Component {
     error: false,
     query: '',
     page: 1,
+    showModal: false,
   };
 
-  async componentDidMount() {
-    await this.fetchInitialImages();
+  componentDidMount() {
+    this.fetchImages();
   }
 
   async componentDidUpdate(prevProps, prevState) {
@@ -26,17 +28,17 @@ export class App extends Component {
     }
   }
 
-  fetchInitialImages = async () => {
-    this.setState({ isLoading: true, page: 1, images: [] });
-    try {
-      const initialImages = await fetchImages();
-      this.setState({ images: initialImages.hits });
-    } catch (error) {
-      console.error('Error fetching initial images:', error);
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
+  // fetchInitialImages = async () => {
+  //   this.setState({ isLoading: true });
+  //   try {
+  //     const initialImages = await fetchImages();
+  //     this.setState({ images: initialImages.hits });
+  //   } catch (error) {
+  //     console.error('Error fetching initial images:', error);
+  //   } finally {
+  //     this.setState({ isLoading: false });
+  //   }
+  // };
 
   fetchImages = async () => {
     const { query, page } = this.state;
@@ -57,21 +59,14 @@ export class App extends Component {
   };
 
   handleSearchImageName = async newName => {
-    try {
-      this.setState({ query: newName, page: 1 }, () => {
-        this.fetchImages();
-      });
-    } catch (error) {
-      toast.error('ERROR!!! Write name for search!');
-    }
+    this.setState({ query: newName, page: 1 });
   };
 
   handleLoadMore = async () => {
-    await this.setState(prevState => ({
+    // const { query, page } = this.state;
+    this.setState(prevState => ({
       page: prevState.page + 1,
     }));
-
-    await this.fetchImages();
   };
 
   render() {
@@ -79,26 +74,12 @@ export class App extends Component {
 
     return (
       <div>
-        {isLoading ? (
-          <p>
-            <MagnifyingGlass
-              visible={true}
-              height="80"
-              width="80"
-              ariaLabel="MagnifyingGlass-loading"
-              wrapperStyle={{}}
-              wrapperClass="MagnifyingGlass-wrapper"
-              glassColor="#c0efff"
-              color="#e15b64"
-            />
-          </p>
-        ) : (
-          <>
-            <SearchBar onSubmit={this.handleSearchImageName} />
-            <ImageGallery images={images} />
-            <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
-          </>
-        )}
+        {isLoading && <Spinner />}
+        <>
+          <SearchBar onSubmit={this.handleSearchImageName} />
+          <ImageGallery images={images} />
+          <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
+        </>
       </div>
     );
   }
