@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { AppStyled } from './App.styled';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { fetchImages } from 'services/api';
 import ImageGallery from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/Searchbar';
@@ -36,21 +36,27 @@ export class App extends Component {
     this.setState({ isLoading: true });
     try {
       const newImages = await fetchImages(query, page);
-      this.setState(prevState => ({
-        images:
-          page === 1
-            ? newImages.hits
-            : [...prevState.images, ...newImages.hits],
-      }));
+
+      if (newImages && newImages.hits && newImages.hits.length > 0) {
+        this.setState(prevState => ({
+          images:
+            page === 1
+              ? newImages.hits
+              : [...prevState.images, ...newImages.hits],
+        }));
+      } else {
+        toast.error('Sorry, no photo at your request(');
+      }
     } catch (error) {
-      toast.error('Error fetching images:', error);
+      console.error('Error fetching images:', error);
+      toast.error('Error fetching images. Please try again later.');
     } finally {
       this.setState({ isLoading: false });
     }
   };
 
   handleSearchImageName = async newName => {
-    this.setState({ query: newName, page: 1 });
+    this.setState({ query: newName, page: 1, images: [] });
   };
 
   handleLoadMore = async () => {
@@ -77,22 +83,25 @@ export class App extends Component {
   };
 
   render() {
-    const { images, isLoading, showModal, largeImageURL, tagImage } =
+    const { query, images, isLoading, showModal, largeImageURL, tagImage } =
       this.state;
 
     return (
       <AppStyled>
         {isLoading && <Spinner />}
-        <>
-          <SearchBar onSubmit={this.handleSearchImageName} />
+        <SearchBar onSubmit={this.handleSearchImageName} />
+        {query && (
           <ImageGallery images={images} onClickModal={this.openModal} />
-        </>
-        <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
+        )}
+        {query && (
+          <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
+        )}
         {showModal && (
           <Modal onCloseModal={this.closeModal}>
             <img src={largeImageURL} alt={tagImage} />
           </Modal>
         )}
+        <Toaster position="top-center" reverseOrder={false} />
       </AppStyled>
     );
   }
