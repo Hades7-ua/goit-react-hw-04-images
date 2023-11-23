@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-
+import { AppStyled } from './App.styled';
 import toast from 'react-hot-toast';
 import { fetchImages } from 'services/api';
 import ImageGallery from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/Searchbar';
 import { BtnLoadMore } from './ButtonLoadMore/LoadMoreBtn';
 import Spinner from './Loader/Spinner';
+// import Modal from './Modal/Modal';
 export class App extends Component {
   state = {
     images: [],
@@ -27,18 +28,6 @@ export class App extends Component {
       await this.fetchImages();
     }
   }
-
-  // fetchInitialImages = async () => {
-  //   this.setState({ isLoading: true });
-  //   try {
-  //     const initialImages = await fetchImages();
-  //     this.setState({ images: initialImages.hits });
-  //   } catch (error) {
-  //     console.error('Error fetching initial images:', error);
-  //   } finally {
-  //     this.setState({ isLoading: false });
-  //   }
-  // };
 
   fetchImages = async () => {
     const { query, page } = this.state;
@@ -63,7 +52,6 @@ export class App extends Component {
   };
 
   handleLoadMore = async () => {
-    // const { query, page } = this.state;
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
@@ -73,16 +61,28 @@ export class App extends Component {
     const { images, isLoading } = this.state;
 
     return (
-      <div>
+      <AppStyled>
         {isLoading && <Spinner />}
         <>
           <SearchBar onSubmit={this.handleSearchImageName} />
-          <ImageGallery images={images} />
-          <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
+          <ImageGallery images={images} onImageClick={this.openModal} />
         </>
-      </div>
+        <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
+      </AppStyled>
     );
   }
 }
 
 export default App;
+
+// fetchInitialImages = async () => {
+//   this.setState({ isLoading: true });
+//   try {
+//     const initialImages = await fetchImages();
+//     this.setState({ images: initialImages.hits });
+//   } catch (error) {
+//     console.error('Error fetching initial images:', error);
+//   } finally {
+//     this.setState({ isLoading: false });
+//   }
+// };
