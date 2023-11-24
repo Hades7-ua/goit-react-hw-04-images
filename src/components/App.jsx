@@ -17,11 +17,9 @@ export class App extends Component {
     showModal: false,
     largeImageURL: '',
     tagImage: '',
+    showButton: false,
+    per_page: 12,
   };
-
-  componentDidMount() {
-    this.fetchImages();
-  }
 
   async componentDidUpdate(prevProps, prevState) {
     const { query, page } = this.state;
@@ -32,17 +30,16 @@ export class App extends Component {
   }
 
   fetchImages = async () => {
-    const { query, page } = this.state;
+    const { query, page, per_page } = this.state;
     this.setState({ isLoading: true });
     try {
       const newImages = await fetchImages(query, page);
+      const { totalHits } = newImages;
 
       if (newImages && newImages.hits && newImages.hits.length > 0) {
         this.setState(prevState => ({
-          images:
-            page === 1
-              ? newImages.hits
-              : [...prevState.images, ...newImages.hits],
+          images: [...prevState.images, ...newImages.hits],
+          showButton: page < Math.ceil(totalHits / per_page),
         }));
       } else {
         toast.error('Sorry, no photo at your request(');
@@ -83,8 +80,16 @@ export class App extends Component {
   };
 
   render() {
-    const { query, images, isLoading, showModal, largeImageURL, tagImage } =
-      this.state;
+    const {
+      query,
+      images,
+      isLoading,
+      showModal,
+      largeImageURL,
+      tagImage,
+      showButton,
+      page,
+    } = this.state;
 
     return (
       <AppStyled>
@@ -93,10 +98,10 @@ export class App extends Component {
         {query && (
           <ImageGallery images={images} onClickModal={this.openModal} />
         )}
-        {query && (
+        {showButton && (
           <BtnLoadMore onClick={this.handleLoadMore}>Load More</BtnLoadMore>
         )}
-        {showModal && (
+        {page !== 0 && showModal && (
           <Modal onCloseModal={this.closeModal}>
             <img src={largeImageURL} alt={tagImage} />
           </Modal>
