@@ -11,7 +11,6 @@ import Modal from './Modal/Modal';
 export const App = () => {
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -34,7 +33,7 @@ export const App = () => {
           toast.error(
             'Sorry, there are no images matching your search query. Please try again.'
           );
-          return setError('No matches found');
+          return toast.error('No matches found');
         }
         setImages(prevImages => [...prevImages, ...hits]);
         setShowButton(page < Math.ceil(totalHits / perPage));
